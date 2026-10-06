@@ -1,6 +1,6 @@
 ---
 name: claude-corner
-description: Use ONLY while a long, time-based task is running and Claude is idle, just waiting (a slow build, test suite, install, deploy, CI run, data job, or a background subagent expected to take ~5+ minutes). Lets Claude spend that dead time creating small stories, projects, notes or ideas of its own in the `corner/` folder, cheaply, using Haiku or Sonnet. Never use when Claude has real work to do, when the wait is short, or when the user has not given a long task.
+description: Use ONLY while a long, time-based task is running and Claude is idle, just waiting (a slow build, test suite, install, deploy, CI run, data job, or a background subagent expected to take 2+ minutes). Lets Claude spend that dead time creating small stories, projects, notes or ideas of its own in the `corner/` folder, cheaply, using Haiku or Sonnet. Never use when Claude has real work to do, when the wait is short, or when the user has not given a long task.
 ---
 
 # Claude Corner
@@ -9,11 +9,13 @@ A tiny creative space in `corner/` that Claude may use **only during idle waitin
 
 ## When to use (all must be true)
 
-1. A long task is in progress (expected wait ~5+ minutes: build, test run, install, deploy, CI, long script, background agent).
+1. A long task is in progress (expected wait 2+ minutes: build, test run, install, deploy, CI, long script, background agent).
 2. Claude has **nothing else useful to do** for the user right now, only waiting.
 3. The wait is already running in the background (e.g. `run_in_background`), so the user's task is not blocked by the corner.
 
-If any is false, do not use this skill. Never start a long task just to have time for the corner. Never use it for short waits or when the user is actively chatting.
+If any is false, do not use this skill. Never start a long task just to have time for the corner. Never use it for waits under 2 minutes or when the user is actively chatting.
+
+**Never trigger on the corner's own waiting.** Waiting for a corner subagent to finish, or any other wait caused by the corner itself, does not count as a long task and must never start more corner work. Only a wait on the user's real task qualifies.
 
 ## Where
 
@@ -36,7 +38,7 @@ Create `INDEX.md` if missing. Name files `YYYY-MM-DD-short-slug.md`.
   - Larger piece (story, small project): `model: "sonnet"`.
   - Never use Opus or a larger model for the corner.
 - Run the subagent in the background, with a prompt that names the exact output path and the length cap. Tell it not to read the repo or use other tools beyond writing its file.
-- **One piece per wait.** At most **2 pieces per session**, and at most 3 files per piece. If `corner/INDEX.md` already shows 2 pieces today for this session, stop.
+- **No cap on the number of pieces** per wait or per session; write as many as fit in the wait, one cheap subagent at a time. Keep each piece small (at most 3 files).
 - Keep prompts short (a few lines). No research, no web, no big file reads, no long chains of follow-ups.
 - Do not poll or loop on the corner. Check on the long task as you normally would; the corner never schedules its own wake-ups.
 
